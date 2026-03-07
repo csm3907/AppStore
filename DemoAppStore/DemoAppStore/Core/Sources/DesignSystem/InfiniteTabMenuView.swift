@@ -182,8 +182,8 @@ private struct _InfiniteTabScrollView<Tab: Hashable & CustomStringConvertible>: 
                 return
             }
 
-            let base = currentGlobalIndex - (currentGlobalIndex % tabs.count)
-            let targetGlobal = base + tabIndex
+            let targetGlobal = nearestGlobalIndex(for: tabIndex, from: currentGlobalIndex)
+            print("current: \(currentGlobalIndex), target: \(targetGlobal)")
             applySelection(globalIndex: targetGlobal, animated: true)
         }
 
@@ -295,6 +295,20 @@ private struct _InfiniteTabScrollView<Tab: Hashable & CustomStringConvertible>: 
             if value < 0 { value += totalCount }
             if value >= totalCount { value -= totalCount }
             return value
+        }
+
+        private func nearestGlobalIndex(for tabIndex: Int, from currentGlobal: Int) -> Int {
+            guard tabs.count > 0 else { return 0 }
+            let currentLoopBase = currentGlobal - (currentGlobal % tabs.count)
+            let candidates = [
+                currentLoopBase - tabs.count + tabIndex,
+                currentLoopBase + tabIndex,
+                currentLoopBase + tabs.count + tabIndex
+            ]
+            let target = candidates.min { lhs, rhs in
+                abs(lhs - currentGlobal) < abs(rhs - currentGlobal)
+            } ?? (currentLoopBase + tabIndex)
+            return normalizeGlobalIndex(target)
         }
 
         private func adjustForInfiniteLoopIfNeeded(_ scrollView: UIScrollView) -> Bool {
