@@ -4,6 +4,6 @@ import Testing
 struct FixmePresentationHomeTests {
     @Test
     func placeholder() async throws {
-        _ = FixmeHomeView()
+        _ = HomeView()
     }
 }

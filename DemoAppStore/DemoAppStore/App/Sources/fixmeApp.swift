@@ -6,7 +6,7 @@ import PresentationDetail
 struct FixmeDemoAppStoreApp: App {
     var body: some Scene {
         WindowGroup {
-            FixmeHomeView()
+            HomeView()
         }
     }
 }

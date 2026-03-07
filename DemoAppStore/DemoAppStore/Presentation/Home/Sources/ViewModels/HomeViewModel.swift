@@ -1,5 +1,5 @@
 import Foundation
 
-public final class FixmeHomeViewModel {
+public final class HomeViewModel {
     public init() {}
 }
