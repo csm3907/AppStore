@@ -9,6 +9,7 @@ let project = Project(
             destinations: .iOS,
             product: .framework,
             bundleId: "dev.tuist.DemoAppStore.Core",
+            deploymentTargets: .iOS("15.0"),
             infoPlist: .default,
             buildableFolders: [
                 "DemoAppStore/Core/Sources"
@@ -21,6 +22,7 @@ let project = Project(
             destinations: .iOS,
             product: .framework,
             bundleId: "dev.tuist.DemoAppStore.Domain",
+            deploymentTargets: .iOS("15.0"),
             infoPlist: .default,
             buildableFolders: [
                 "DemoAppStore/Domain/Sources"
@@ -35,6 +37,7 @@ let project = Project(
             destinations: .iOS,
             product: .framework,
             bundleId: "dev.tuist.DemoAppStore.Data",
+            deploymentTargets: .iOS("15.0"),
             infoPlist: .default,
             buildableFolders: [
                 "DemoAppStore/Data/Sources"
@@ -50,6 +53,7 @@ let project = Project(
             destinations: .iOS,
             product: .framework,
             bundleId: "dev.tuist.DemoAppStore.PresentationHome",
+            deploymentTargets: .iOS("15.0"),
             infoPlist: .default,
             buildableFolders: [
                 "DemoAppStore/Presentation/Home/Sources"
@@ -65,6 +69,7 @@ let project = Project(
             destinations: .iOS,
             product: .framework,
             bundleId: "dev.tuist.DemoAppStore.PresentationDetail",
+            deploymentTargets: .iOS("15.0"),
             infoPlist: .default,
             buildableFolders: [
                 "DemoAppStore/Presentation/Detail/Sources"
@@ -80,6 +85,7 @@ let project = Project(
             destinations: .iOS,
             product: .app,
             bundleId: "dev.tuist.DemoAppStore",
+            deploymentTargets: .iOS("15.0"),
             infoPlist: .extendingDefault(
                 with: [
                     "UILaunchScreen": [
@@ -104,6 +110,7 @@ let project = Project(
             destinations: .iOS,
             product: .app,
             bundleId: "dev.tuist.DemoAppStore.HomeApp",
+            deploymentTargets: .iOS("15.0"),
             infoPlist: .default,
             buildableFolders: [
                 "DemoAppStore/FeatureApps/HomeApp/Sources",
@@ -120,6 +127,7 @@ let project = Project(
             destinations: .iOS,
             product: .app,
             bundleId: "dev.tuist.DemoAppStore.DetailApp",
+            deploymentTargets: .iOS("15.0"),
             infoPlist: .default,
             buildableFolders: [
                 "DemoAppStore/FeatureApps/DetailApp/Sources",
@@ -136,6 +144,7 @@ let project = Project(
             destinations: .iOS,
             product: .unitTests,
             bundleId: "dev.tuist.DemoAppStore.DomainTests",
+            deploymentTargets: .iOS("15.0"),
             infoPlist: .default,
             buildableFolders: [
                 "DemoAppStore/Tests/Domain"
@@ -149,6 +158,7 @@ let project = Project(
             destinations: .iOS,
             product: .unitTests,
             bundleId: "dev.tuist.DemoAppStore.DataTests",
+            deploymentTargets: .iOS("15.0"),
             infoPlist: .default,
             buildableFolders: [
                 "DemoAppStore/Tests/Data"
@@ -162,6 +172,7 @@ let project = Project(
             destinations: .iOS,
             product: .unitTests,
             bundleId: "dev.tuist.DemoAppStore.PresentationHomeTests",
+            deploymentTargets: .iOS("15.0"),
             infoPlist: .default,
             buildableFolders: [
                 "DemoAppStore/Tests/Presentation/Home"
