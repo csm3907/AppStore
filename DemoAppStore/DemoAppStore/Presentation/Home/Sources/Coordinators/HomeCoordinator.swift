@@ -1,5 +1,5 @@
 import Foundation
 
-public final class FixmeHomeCoordinator {
+public final class HomeCoordinator {
     public init() {}
 }

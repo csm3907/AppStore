@@ -1,9 +1,9 @@
 import Testing
 @testable import Data
 
-struct FixmeDataTests {
+struct DataTests {
     @Test
     func placeholder() async throws {
-        _ = FixmeDTO(id: UUID())
+        #expect(true)
     }
 }

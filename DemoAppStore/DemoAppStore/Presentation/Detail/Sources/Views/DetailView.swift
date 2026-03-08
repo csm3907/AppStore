@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct FixmeDetailView: View {
+public struct DetailView: View {
     public init() {}
 
     public var body: some View {

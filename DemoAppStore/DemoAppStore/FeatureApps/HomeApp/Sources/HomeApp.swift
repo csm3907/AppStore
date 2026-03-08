@@ -1,9 +1,8 @@
 import SwiftUI
 import PresentationHome
-import PresentationDetail
 
 @main
-struct FixmeDemoAppStoreApp: App {
+struct HomeApp: App {
     var body: some Scene {
         WindowGroup {
             HomeView()

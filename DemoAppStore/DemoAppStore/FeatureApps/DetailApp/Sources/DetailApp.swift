@@ -1,11 +1,11 @@
 import SwiftUI
-import PresentationHome
+import PresentationDetail
 
 @main
-struct FixmeHomeApp: App {
+struct DetailApp: App {
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            DetailView()
         }
     }
 }

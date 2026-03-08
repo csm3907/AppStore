@@ -1,5 +1,5 @@
 import Foundation
 
-public final class FixmeDetailViewModel {
+public final class DetailViewModel {
     public init() {}
 }

@@ -1,5 +1,5 @@
 import Foundation
 
-public struct FixmeUtilities {
+public final class DetailCoordinator {
     public init() {}
 }
