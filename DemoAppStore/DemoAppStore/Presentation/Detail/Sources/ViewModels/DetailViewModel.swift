@@ -22,7 +22,7 @@ public final class DetailViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            let apps = try await fetchUseCase.execute(genreId: genreId, limit: 1, offset: 0)
+            let apps = try await fetchUseCase.execute(term: "app", genreId: genreId, limit: 1, offset: 0)
             app = apps.first
             if app == nil {
                 errorMessage = "데이터가 없습니다."

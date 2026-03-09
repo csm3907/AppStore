@@ -12,23 +12,20 @@ public struct AppStoreListRepositoryImpl: AppStoreListRepository {
     private let baseURL: URL
     private let country: String
     private let entity: String
-    private let term: String
-
     public init(
         client: NetworkClientProtocol,
         baseURL: URL = URL(string: "https://itunes.apple.com/search")!,
         country: String = "KR",
-        entity: String = "software",
-        term: String = "app"
+        entity: String = "software"
     ) {
         self.client = client
         self.baseURL = baseURL
         self.country = country
         self.entity = entity
-        self.term = term
     }
 
     public func fetchApps(
+        term: String,
         genreId: Int,
         limit: Int,
         offset: Int
@@ -50,11 +47,15 @@ public struct AppStoreListRepositoryImpl: AppStoreListRepository {
             throw AppStoreRepositoryError.invalidURL
         }
 
+        print("[AppStoreListRepository] Request: \(url.absoluteString)")
+
         let response: AppStoreSearchResponse = try await client.get(
             url,
             headers: [:],
             decoder: JSONDecoder()
         )
+        print("[AppStoreListRepository] Response: resultCount=\(String(describing: response.results.map({ $0.trackName })))")
+
         return try response.results.map { dto in
             try map(dto: dto)
         }

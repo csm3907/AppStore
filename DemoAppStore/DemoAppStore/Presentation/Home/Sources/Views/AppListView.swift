@@ -4,12 +4,14 @@ import UniformTypeIdentifiers
 
 struct AppListView: View {
     // MARK: - Variables
-    let apps: [AppInfo]
+    @Binding var apps: [AppInfo]
     @Binding var selectedIndex: Int
     @Binding var memoText: String
     @Binding var isShowingMemoEditor: Bool
     @Binding var isShowingMemoOnDrag: Bool
     @Binding var selectedApp: AppInfo?
+    let isLoadingMore: Bool
+    let onLoadMore: () -> Void
     @State private var showPreviousCard = false
 
     private let tabs = HomeTab.allCases
@@ -20,26 +22,41 @@ struct AppListView: View {
             ZStack {
                 ForEach(0..<tabs.count, id: \.self) { index in
                     if index == selectedIndex {
-                        RoundedRectangle(cornerRadius: 24)
-                            .overlay {
-                                List(apps, id: \.id) { app in
-                                    AppRowView(app: app)
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            selectedApp = app
+                        List {
+                            ForEach(apps, id: \.id) { app in
+                                AppRowView(app: app)
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        selectedApp = app
+                                    }
+                                    .onDrop(of: [UTType.text.identifier], isTargeted: nil) { providers in
+                                        handleDrop(providers: providers, appId: app.id)
+                                    }
+                                    .onAppear {
+                                        if app.id == apps.last?.id {
+                                            onLoadMore()
                                         }
-                                        .onDrop(of: [UTType.text.identifier], isTargeted: nil) { providers in
-                                            handleDrop(providers: providers, appId: app.id)
-                                        }
-                                }
-                                .listStyle(.plain)
+                                    }
                             }
-                            .transition(
-                                .asymmetric(
-                                    insertion: .move(edge: showPreviousCard ? .leading : .trailing),
-                                    removal: .move(edge: showPreviousCard ? .trailing : .leading)
-                                )
+
+                            if isLoadingMore {
+                                HStack {
+                                    Spacer()
+                                    ProgressView()
+                                        .progressViewStyle(.circular)
+                                        .frame(maxWidth: 180)
+                                    Spacer()
+                                }
+                                .padding(.vertical, 8)
+                            }
+                        }
+                        .listStyle(.plain)
+                        .transition(
+                            .asymmetric(
+                                insertion: .move(edge: showPreviousCard ? .leading : .trailing),
+                                removal: .move(edge: showPreviousCard ? .trailing : .leading)
                             )
+                        )
                     }
                 }
             }
@@ -105,6 +122,7 @@ private struct AppRowView: View {
                 switch phase {
                 case .empty:
                     ProgressView()
+                        .progressViewStyle(.circular)
                         .frame(width: 56, height: 56)
                 case .success(let image):
                     image

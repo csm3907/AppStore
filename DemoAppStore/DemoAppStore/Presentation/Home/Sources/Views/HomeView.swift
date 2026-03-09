@@ -20,12 +20,10 @@ public struct HomeView: View {
     public var body: some View {
         content
             .task {
-                await viewModel.fetchApps(genreId: tabs[selectedIndex].genreId)
+                viewModel.requestFetch(term: tabs[selectedIndex].term, genreId: tabs[selectedIndex].genreId)
             }
             .onChange(of: selectedIndex) { newIndex in
-                Task {
-                    await viewModel.fetchApps(genreId: tabs[newIndex].genreId)
-                }
+                viewModel.requestFetch(term: tabs[newIndex].term, genreId: tabs[newIndex].genreId)
             }
             .sheet(item: $selectedApp, onDismiss: handleSheetDismiss) { app in
                 DetailView(
@@ -63,16 +61,32 @@ public struct HomeView: View {
     private var mainContent: some View {
         ZStack {
             VStack(spacing: 0) {
-                InfiniteTabMenuView(tabs: tabs, selectedIndex: $selectedIndex)
+                InfiniteTabMenuView(tabs: tabs, selectedIndex: $selectedIndex) { index in
+                    viewModel.requestFetch(term: tabs[index].term, genreId: tabs[index].genreId)
+                }
 
-                AppListView(
-                    apps: viewModel.apps,
-                    selectedIndex: $selectedIndex,
-                    memoText: $memoText,
-                    isShowingMemoEditor: $isShowingMemoEditor,
-                    isShowingMemoOnDrag: $isShowingMemoOnDrag,
-                    selectedApp: $selectedApp
-                )
+                if viewModel.isLoading {
+                    Spacer()
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                    Spacer()
+                } else {
+                    AppListView(
+                        apps: $viewModel.apps,
+                        selectedIndex: $selectedIndex,
+                        memoText: $memoText,
+                        isShowingMemoEditor: $isShowingMemoEditor,
+                        isShowingMemoOnDrag: $isShowingMemoOnDrag,
+                        selectedApp: $selectedApp,
+                        isLoadingMore: viewModel.isLoadingMore,
+                        onLoadMore: {
+                            viewModel.loadMore(
+                                term: tabs[selectedIndex].term,
+                                genreId: tabs[selectedIndex].genreId
+                            )
+                        }
+                    )
+                }
             }
 
             if isShowingMemoEditor {

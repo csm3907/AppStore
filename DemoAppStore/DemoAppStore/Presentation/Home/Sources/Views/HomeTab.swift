@@ -39,4 +39,29 @@ enum HomeTab: String, CaseIterable, CustomStringConvertible, Identifiable {
             return 6011
         }
     }
+
+    var term: String {
+        switch self {
+        case .finance:
+            return "finance"
+        case .novels:
+            return "novel"
+        case .photoVideo:
+            return "photo"
+        case .games:
+            return "game"
+        case .entertainment:
+            return "entertainment"
+        case .shopping:
+            return "shopping"
+        case .healthFitness:
+            return "health"
+        case .productivity:
+            return "productivity"
+        case .education:
+            return "education"
+        case .music:
+            return "music"
+        }
+    }
 }

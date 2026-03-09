@@ -25,15 +25,25 @@ public struct InfiniteTabMenuView<Tab: Hashable & CustomStringConvertible>: View
 
     let tabs: [Tab]
     @Binding var selectedIndex: Int
+    let onScrollEnd: ((Int) -> Void)?
 
-    public init(tabs: [Tab], selectedIndex: Binding<Int>) {
+    public init(
+        tabs: [Tab],
+        selectedIndex: Binding<Int>,
+        onScrollEnd: ((Int) -> Void)? = nil
+    ) {
         self.tabs = tabs
         self._selectedIndex = selectedIndex
+        self.onScrollEnd = onScrollEnd
     }
 
     public var body: some View {
         VStack(spacing: 0) {
-            _InfiniteTabScrollView(tabs: tabs, selectedIndex: $selectedIndex)
+            _InfiniteTabScrollView(
+                tabs: tabs,
+                selectedIndex: $selectedIndex,
+                onScrollEnd: onScrollEnd
+            )
                 .frame(height: 46)
 
             Divider()
@@ -48,9 +58,14 @@ private struct _InfiniteTabScrollView<Tab: Hashable & CustomStringConvertible>: 
 
     let tabs: [Tab]
     @Binding var selectedIndex: Int
+    let onScrollEnd: ((Int) -> Void)?
 
     func makeCoordinator() -> Coordinator<Tab> {
-        Coordinator(tabs: tabs, selectedIndex: $selectedIndex)
+        Coordinator(
+            tabs: tabs,
+            selectedIndex: $selectedIndex,
+            onScrollEnd: onScrollEnd
+        )
     }
 
     func makeUIView(context: Context) -> UIScrollView {
@@ -68,6 +83,7 @@ private struct _InfiniteTabScrollView<Tab: Hashable & CustomStringConvertible>: 
 
         let tabs: [TabItem]
         @Binding var selectedIndex: Int
+        private let onScrollEnd: ((Int) -> Void)?
 
         // ── 무한 스크롤 핵심 상수 ───────────────────────────
         private let repeatCount = 5
@@ -93,9 +109,14 @@ private struct _InfiniteTabScrollView<Tab: Hashable & CustomStringConvertible>: 
         private let tabHeight: CGFloat = 44
         private let tabPadding: CGFloat = 16
 
-        init(tabs: [TabItem], selectedIndex: Binding<Int>) {
+        init(
+            tabs: [TabItem],
+            selectedIndex: Binding<Int>,
+            onScrollEnd: ((Int) -> Void)?
+        ) {
             self.tabs = tabs
             self._selectedIndex = selectedIndex
+            self.onScrollEnd = onScrollEnd
         }
 
         // MARK: - Setup
@@ -238,6 +259,16 @@ private struct _InfiniteTabScrollView<Tab: Hashable & CustomStringConvertible>: 
             isProgrammaticScroll = false
         }
 
+        func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+            if !decelerate {
+                notifyScrollEnd()
+            }
+        }
+
+        func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+            notifyScrollEnd()
+        }
+
         func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
             isProgrammaticScroll = false
         }
@@ -268,6 +299,10 @@ private struct _InfiniteTabScrollView<Tab: Hashable & CustomStringConvertible>: 
 
         private func updateUI(tabIndex: Int, animated: Bool) {
             updateButtonStyles()
+        }
+
+        private func notifyScrollEnd() {
+            onScrollEnd?(currentTabIndex)
         }
 
         private func setSelectedIndexSafely(_ tabIndex: Int) {

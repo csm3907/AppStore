@@ -8,11 +8,13 @@ public struct AppStoreFetchUseCase {
     }
 
     public func execute(
+        term: String,
         genreId: Int,
         limit: Int = 20,
         offset: Int = 0
     ) async throws -> [AppInfo] {
         return try await repository.fetchApps(
+            term: term,
             genreId: genreId,
             limit: limit,
             offset: offset
