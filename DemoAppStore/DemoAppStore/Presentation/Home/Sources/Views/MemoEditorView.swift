@@ -3,7 +3,20 @@ import SwiftUI
 struct MemoEditorView: View {
     @Binding var text: String
     @Binding var isShowingMemoOnDrag: Bool
+    let appName: String?
     var onCancel: () -> Void
+
+    init(
+        text: Binding<String>,
+        isShowingMemoOnDrag: Binding<Bool>,
+        appName: String? = nil,
+        onCancel: @escaping () -> Void
+    ) {
+        _text = text
+        _isShowingMemoOnDrag = isShowingMemoOnDrag
+        self.appName = appName
+        self.onCancel = onCancel
+    }
 
     var body: some View {
         VStack(spacing: 12) {
@@ -19,11 +32,22 @@ struct MemoEditorView: View {
                 .foregroundStyle(.secondary)
             }
 
+            if let appName, !appName.isEmpty {
+                Text(appName)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
             TextEditor(text: $text)
                 .frame(height: 160)
                 .padding(8)
                 .background(Color.secondary.opacity(0.08))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
+                .onChange(of: text) { newValue in
+                    if newValue.count > 100 {
+                        text = String(newValue.prefix(100))
+                    }
+                }
 
             HStack {
                 Image(systemName: "hand.draw")
