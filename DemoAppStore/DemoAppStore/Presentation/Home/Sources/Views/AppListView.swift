@@ -9,6 +9,7 @@ struct AppListView: View {
     @Binding var memoText: String
     @Binding var isShowingMemoEditor: Bool
     @Binding var isShowingMemoOnDrag: Bool
+    @Binding var selectedApp: AppInfo?
     @State private var showPreviousCard = false
 
     private let tabs = HomeTab.allCases
@@ -23,6 +24,10 @@ struct AppListView: View {
                             .overlay {
                                 List(apps, id: \.id) { app in
                                     AppRowView(app: app)
+                                        .contentShape(Rectangle())
+                                        .onTapGesture {
+                                            selectedApp = app
+                                        }
                                         .onDrop(of: [UTType.text.identifier], isTargeted: nil) { providers in
                                             handleDrop(providers: providers, appId: app.id)
                                         }

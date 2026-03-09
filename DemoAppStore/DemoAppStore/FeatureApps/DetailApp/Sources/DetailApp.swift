@@ -9,7 +9,7 @@ struct DetailApp: App {
 
     var body: some Scene {
         WindowGroup {
-            DetailView()
+            DetailAppRootView()
         }
     }
 }

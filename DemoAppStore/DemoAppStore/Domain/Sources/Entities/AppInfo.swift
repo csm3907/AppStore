@@ -1,6 +1,6 @@
 import Foundation
 
-public struct AppInfo: Equatable {
+public struct AppInfo: Equatable, Identifiable {
     public let id: Int
     public let name: String
     public let seller: String
@@ -38,4 +38,5 @@ public struct AppInfo: Equatable {
         self.description = description
         self.screenshotUrls = screenshotUrls
     }
+
 }

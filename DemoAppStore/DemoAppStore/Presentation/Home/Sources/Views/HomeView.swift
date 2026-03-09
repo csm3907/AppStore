@@ -1,6 +1,8 @@
 import SwiftUI
 import UIKit
 import Core
+import Domain
+import PresentationDetail
 
 public struct HomeView: View {
     @StateObject private var viewModel: HomeViewModel = HomeViewModel()
@@ -8,6 +10,9 @@ public struct HomeView: View {
     @State private var isShowingMemoEditor = false
     @State private var isShowingMemoOnDrag = false
     @State private var memoText = ""
+    @State private var selectedApp: AppInfo?
+    @State private var fullScreenApp: AppInfo?
+    @State private var pendingFullScreenApp: AppInfo?
     private let tabs = HomeTab.allCases
 
     public init() {}
@@ -21,6 +26,23 @@ public struct HomeView: View {
                 Task {
                     await viewModel.fetchApps(genreId: tabs[newIndex].genreId)
                 }
+            }
+            .sheet(item: $selectedApp, onDismiss: handleSheetDismiss) { app in
+                DetailView(
+                    app: app,
+                    showsFullScreenButton: true,
+                    showsCloseButton: true
+                ) {
+                    pendingFullScreenApp = app
+                    selectedApp = nil
+                }
+            }
+            .fullScreenCover(item: $fullScreenApp) { app in
+                DetailView(
+                    app: app,
+                    showsFullScreenButton: false,
+                    showsCloseButton: true
+                ) {}
             }
     }
 
@@ -48,7 +70,8 @@ public struct HomeView: View {
                     selectedIndex: $selectedIndex,
                     memoText: $memoText,
                     isShowingMemoEditor: $isShowingMemoEditor,
-                    isShowingMemoOnDrag: $isShowingMemoOnDrag
+                    isShowingMemoOnDrag: $isShowingMemoOnDrag,
+                    selectedApp: $selectedApp
                 )
             }
 
@@ -78,6 +101,7 @@ public struct HomeView: View {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
                     isShowingMemoEditor = true
+                    isShowingMemoOnDrag = false
                 } label: {
                     Image(systemName: "plus")
                 }
@@ -87,6 +111,13 @@ public struct HomeView: View {
                     Image(systemName: "trash")
                 }
             }
+        }
+    }
+
+    private func handleSheetDismiss() {
+        if let pending = pendingFullScreenApp {
+            fullScreenApp = pending
+            pendingFullScreenApp = nil
         }
     }
 }
