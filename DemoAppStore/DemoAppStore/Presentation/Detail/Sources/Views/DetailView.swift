@@ -1,3 +1,4 @@
+import Core
 import Domain
 import SwiftUI
 
@@ -26,24 +27,20 @@ public struct DetailView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     HStack(spacing: 16) {
-                        AsyncImage(url: app.iconUrl) { phase in
-                            switch phase {
-                            case .empty:
-                                ProgressView()
-                                    .frame(width: 80, height: 80)
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 80, height: 80)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                            case .failure:
-                                RoundedRectangle(cornerRadius: 16)
-                                    .fill(Color.secondary.opacity(0.2))
-                                    .frame(width: 80, height: 80)
-                            @unknown default:
-                                EmptyView()
-                            }
+                        CachedAsyncImage(url: app.iconUrl) { image in
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 80, height: 80)
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                        } placeholder: {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                                .frame(width: 80, height: 80)
+                        } failure: {
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.secondary.opacity(0.2))
+                                .frame(width: 80, height: 80)
                         }
 
                         VStack(alignment: .leading, spacing: 6) {
@@ -81,25 +78,21 @@ public struct DetailView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 12) {
                                 ForEach(app.screenshotUrls, id: \.self) { url in
-                                    AsyncImage(url: url) { phase in
-                                        switch phase {
-                                        case .empty:
-                                            ProgressView()
-                                                .frame(width: 200, height: 420)
-                                        case .success(let image):
-                                            image
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(width: 200, height: 420)
-                                                .clipped()
-                                                .clipShape(RoundedRectangle(cornerRadius: 16))
-                                        case .failure:
-                                            RoundedRectangle(cornerRadius: 16)
-                                                .fill(Color.secondary.opacity(0.2))
-                                                .frame(width: 200, height: 420)
-                                        @unknown default:
-                                            EmptyView()
-                                        }
+                                    CachedAsyncImage(url: url) { image in
+                                        image
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 200, height: 420)
+                                            .clipped()
+                                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                                    } placeholder: {
+                                        ProgressView()
+                                            .progressViewStyle(.circular)
+                                            .frame(width: 200, height: 420)
+                                    } failure: {
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .fill(Color.secondary.opacity(0.2))
+                                            .frame(width: 200, height: 420)
                                     }
                                 }
                             }

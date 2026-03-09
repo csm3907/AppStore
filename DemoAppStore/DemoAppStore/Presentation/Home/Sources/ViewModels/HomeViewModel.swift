@@ -1,6 +1,7 @@
 import Core
 import Domain
 import Foundation
+import SwiftUI
 
 @MainActor
 public final class HomeViewModel: ObservableObject {
@@ -8,6 +9,8 @@ public final class HomeViewModel: ObservableObject {
     @Published public private(set) var isLoading = false
     @Published public private(set) var isLoadingMore = false
     @Published public private(set) var errorMessage: String?
+
+    @AppStorage("memo.store.data") private var memoStoreData: Data = Data()
 
     private let fetchUseCase: AppStoreFetchUseCase
     private var debounceTask: Task<Void, Never>?
@@ -100,5 +103,26 @@ public final class HomeViewModel: ObservableObject {
         let currentOffset = offsetsByGenre[genreId] ?? 0
         let nextOffset = currentOffset + limit
         await fetchAppsNow(term: term, genreId: genreId, limit: limit, offset: nextOffset, append: true)
+    }
+
+    public func saveMemo(_ text: String, for appId: Int) {
+        var store = loadMemoStore()
+        store[appId] = text
+        memoStoreData = encodeMemoStore(store)
+    }
+
+    public func memo(for appId: Int) -> String? {
+        loadMemoStore()[appId]
+    }
+
+    private func loadMemoStore() -> [Int: String] {
+        guard !memoStoreData.isEmpty else {
+            return [:]
+        }
+        return (try? JSONDecoder().decode([Int: String].self, from: memoStoreData)) ?? [:]
+    }
+
+    private func encodeMemoStore(_ store: [Int: String]) -> Data {
+        (try? JSONEncoder().encode(store)) ?? Data()
     }
 }

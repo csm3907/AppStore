@@ -1,9 +1,11 @@
+import Core
 import Domain
 import SwiftUI
 import UniformTypeIdentifiers
 
 struct AppListView: View {
     // MARK: - Variables
+    @ObservedObject var viewModel: HomeViewModel
     @Binding var apps: [AppInfo]
     @Binding var selectedIndex: Int
     @Binding var memoText: String
@@ -95,10 +97,12 @@ struct AppListView: View {
         if provider.canLoadObject(ofClass: NSString.self) {
             _ = provider.loadObject(ofClass: NSString.self) { object, _ in
                 guard let value = object as? String else { return }
-                saveMemo(value, for: appId)
+                Task { @MainActor in
+                    viewModel.saveMemo(value, for: appId)
+                }
             }
         } else {
-            saveMemo(memoText, for: appId)
+            viewModel.saveMemo(memoText, for: appId)
         }
 
         memoText = ""
@@ -107,10 +111,6 @@ struct AppListView: View {
         return true
     }
 
-    private func saveMemo(_ text: String, for appId: Int) {
-        let key = "memo.app.\(appId)"
-        UserDefaults.standard.set(text, forKey: key)
-    }
 }
 
 private struct AppRowView: View {
@@ -118,25 +118,20 @@ private struct AppRowView: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            AsyncImage(url: app.iconUrl) { phase in
-                switch phase {
-                case .empty:
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .frame(width: 56, height: 56)
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 56, height: 56)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                case .failure:
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.secondary.opacity(0.2))
-                        .frame(width: 56, height: 56)
-                @unknown default:
-                    EmptyView()
-                }
+            CachedAsyncImage(url: app.iconUrl) { image in
+                image
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 56, height: 56)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            } placeholder: {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .frame(width: 56, height: 56)
+            } failure: {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.secondary.opacity(0.2))
+                    .frame(width: 56, height: 56)
             }
 
             VStack(alignment: .leading, spacing: 4) {

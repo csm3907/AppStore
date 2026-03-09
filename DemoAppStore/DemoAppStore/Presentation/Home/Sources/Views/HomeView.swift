@@ -72,6 +72,7 @@ public struct HomeView: View {
                     Spacer()
                 } else {
                     AppListView(
+                        viewModel: viewModel,
                         apps: $viewModel.apps,
                         selectedIndex: $selectedIndex,
                         memoText: $memoText,
