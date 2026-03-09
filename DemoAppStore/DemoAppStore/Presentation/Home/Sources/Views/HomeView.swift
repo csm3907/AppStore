@@ -11,6 +11,7 @@ public struct HomeView: View {
     @State private var isShowingMemoOnDrag = false
     @State private var memoText = ""
     @State private var selectedApp: AppInfo?
+    @State private var selectedMemo: AppInfo?
     @State private var fullScreenApp: AppInfo?
     @State private var pendingFullScreenApp: AppInfo?
     private let tabs = HomeTab.allCases
@@ -79,6 +80,7 @@ public struct HomeView: View {
                         isShowingMemoEditor: $isShowingMemoEditor,
                         isShowingMemoOnDrag: $isShowingMemoOnDrag,
                         selectedApp: $selectedApp,
+                        selectedMemo: $selectedMemo,
                         isLoadingMore: viewModel.isLoadingMore,
                         onLoadMore: {
                             viewModel.loadMore(
@@ -95,12 +97,21 @@ public struct HomeView: View {
                     .ignoresSafeArea()
                     .onTapGesture {
                         memoText = ""
+                        selectedMemo = nil
                         isShowingMemoEditor = false
                         isShowingMemoOnDrag = false
                     }
 
-                MemoEditorView(text: $memoText, isShowingMemoOnDrag: $isShowingMemoOnDrag) {
+                MemoEditorView(text: $memoText, isShowingMemoOnDrag: $isShowingMemoOnDrag, appName: selectedMemo?.name, onSave: {
+                    viewModel.saveMemo(memoText, for: selectedMemo?.id ?? 0)
+                    
                     memoText = ""
+                    selectedMemo = nil
+                    isShowingMemoEditor = false
+                    isShowingMemoOnDrag = false
+                }) {
+                    memoText = ""
+                    selectedMemo = nil
                     isShowingMemoEditor = false
                     isShowingMemoOnDrag = false
                 }

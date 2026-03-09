@@ -4,17 +4,20 @@ struct MemoEditorView: View {
     @Binding var text: String
     @Binding var isShowingMemoOnDrag: Bool
     let appName: String?
+    var onSave: (() -> Void)?
     var onCancel: () -> Void
 
     init(
         text: Binding<String>,
         isShowingMemoOnDrag: Binding<Bool>,
         appName: String? = nil,
+        onSave: (() -> Void)? = nil,
         onCancel: @escaping () -> Void
     ) {
         _text = text
         _isShowingMemoOnDrag = isShowingMemoOnDrag
         self.appName = appName
+        self.onSave = onSave
         self.onCancel = onCancel
     }
 
@@ -23,8 +26,14 @@ struct MemoEditorView: View {
             HStack {
                 Text("메모")
                     .font(.headline)
-
                 Spacer()
+                
+                if appName != nil {
+                    Button("저장") {
+                        onSave?()
+                    }
+                    .foregroundStyle(.secondary)
+                }
 
                 Button("취소") {
                     onCancel()
@@ -48,27 +57,28 @@ struct MemoEditorView: View {
                         text = String(newValue.prefix(100))
                     }
                 }
-
-            HStack {
-                Image(systemName: "hand.draw")
-                Text("메모를 길게 눌러 드래그")
-            }
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .padding(.top, 4)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(Color.secondary.opacity(0.08))
-            .clipShape(Capsule())
-            .onDrag {
-                isShowingMemoOnDrag = true
-                return NSItemProvider(object: text as NSString)
-            } preview: {
-                Text(text.isEmpty ? "메모" : text)
-                    .font(.caption)
-                    .padding(8)
-                    .background(.thinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            if appName == nil {
+                HStack {
+                    Image(systemName: "hand.draw")
+                    Text("메모를 길게 눌러 드래그")
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.top, 4)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Color.secondary.opacity(0.08))
+                .clipShape(Capsule())
+                .onDrag {
+                    isShowingMemoOnDrag = true
+                    return NSItemProvider(object: text as NSString)
+                } preview: {
+                    Text(text.isEmpty ? "메모" : text)
+                        .font(.caption)
+                        .padding(8)
+                        .background(.thinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
             }
         }
         .opacity(isShowingMemoOnDrag ? 0 : 1)
