@@ -5,6 +5,7 @@ import SwiftUI
 
 @MainActor
 public final class HomeViewModel: ObservableObject {
+    private let memoCharacterLimit = 100
     @Published public var apps: [AppInfo] = []
     @Published public private(set) var isLoading = false
     @Published public private(set) var isLoadingMore = false
@@ -106,13 +107,20 @@ public final class HomeViewModel: ObservableObject {
     }
 
     public func saveMemo(_ text: String, for appId: Int) {
+        let limitedText = String(text.prefix(memoCharacterLimit))
         var store = loadMemoStore()
-        store[appId] = text
+        store[appId] = limitedText
         memoStoreData = encodeMemoStore(store)
+        objectWillChange.send()
     }
 
     public func memo(for appId: Int) -> String? {
         loadMemoStore()[appId]
+    }
+
+    public func clearMemos() {
+        memoStoreData = Data()
+        objectWillChange.send()
     }
 
     private func loadMemoStore() -> [Int: String] {
