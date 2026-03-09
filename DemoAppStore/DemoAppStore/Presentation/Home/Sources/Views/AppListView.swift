@@ -12,6 +12,7 @@ struct AppListView: View {
     @Binding var isShowingMemoEditor: Bool
     @Binding var isShowingMemoOnDrag: Bool
     @Binding var selectedApp: AppInfo?
+    @Binding var selectedMemo: AppInfo?
     let isLoadingMore: Bool
     let onLoadMore: () -> Void
     @State private var showPreviousCard = false
@@ -22,45 +23,51 @@ struct AppListView: View {
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
-                ForEach(0..<tabs.count, id: \.self) { index in
-                    if index == selectedIndex {
-                        List {
-                            ForEach(apps, id: \.id) { app in
-                                AppRowView(app: app)
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        selectedApp = app
-                                    }
-                                    .onDrop(of: [UTType.text.identifier], isTargeted: nil) { providers in
-                                        handleDrop(providers: providers, appId: app.id)
-                                    }
-                                    .onAppear {
-                                        if app.id == apps.last?.id {
-                                            onLoadMore()
-                                        }
-                                    }
+                List {
+                    ForEach(apps, id: \.id) { app in
+                        let memoText = viewModel.memo(for: app.id)?.trimmed ?? ""
+                        AppRowView(
+                            app: app,
+                            hasMemo: !memoText.isEmpty,
+                            onIconTap: {
+                                selectedMemo = app
+                                self.memoText = viewModel.memo(for: app.id)?.trimmed ?? ""
+                                isShowingMemoEditor = true
+                                isShowingMemoOnDrag = false
                             }
-
-                            if isLoadingMore {
-                                HStack {
-                                    Spacer()
-                                    ProgressView()
-                                        .progressViewStyle(.circular)
-                                        .frame(maxWidth: 180)
-                                    Spacer()
-                                }
-                                .padding(.vertical, 8)
+                        )
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            selectedApp = app
+                        }
+                        .onDrop(of: [UTType.text.identifier], isTargeted: nil) { providers in
+                            handleDrop(providers: providers, appId: app.id)
+                        }
+                        .onAppear {
+                            if app.id == apps.last?.id {
+                                onLoadMore()
                             }
                         }
-                        .listStyle(.plain)
-                        .transition(
-                            .asymmetric(
-                                insertion: .move(edge: showPreviousCard ? .leading : .trailing),
-                                removal: .move(edge: showPreviousCard ? .trailing : .leading)
-                            )
-                        )
+                    }
+
+                    if isLoadingMore {
+                        HStack {
+                            Spacer()
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                                .frame(maxWidth: 180)
+                            Spacer()
+                        }
+                        .padding(.vertical, 8)
                     }
                 }
+                .listStyle(.plain)
+                .transition(
+                    .asymmetric(
+                        insertion: .move(edge: showPreviousCard ? .leading : .trailing),
+                        removal: .move(edge: showPreviousCard ? .trailing : .leading)
+                    )
+                )
             }
             .gesture(horizontalSwipeGesture)
         }
@@ -115,24 +122,31 @@ struct AppListView: View {
 
 private struct AppRowView: View {
     let app: AppInfo
+    let hasMemo: Bool
+    let onIconTap: () -> Void
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            CachedAsyncImage(url: app.iconUrl) { image in
-                image
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 56, height: 56)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-            } placeholder: {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .frame(width: 56, height: 56)
-            } failure: {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.secondary.opacity(0.2))
-                    .frame(width: 56, height: 56)
+            Button {
+                onIconTap()
+            } label: {
+                CachedAsyncImage(url: app.iconUrl) { image in
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 56, height: 56)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                } placeholder: {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .frame(width: 56, height: 56)
+                } failure: {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.secondary.opacity(0.2))
+                        .frame(width: 56, height: 56)
+                }
             }
+            .buttonStyle(.plain)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(app.name)
@@ -167,6 +181,11 @@ private struct AppRowView: View {
                     }
                 }
             }
+
+            Image(systemName: "note.text")
+                .symbolVariant(hasMemo ? .fill : .none)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(hasMemo ? .accentColor : .secondary)
         }
         .padding(.vertical, 6)
     }
