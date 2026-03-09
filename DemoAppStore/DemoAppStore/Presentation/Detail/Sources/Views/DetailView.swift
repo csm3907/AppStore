@@ -9,6 +9,7 @@ public struct DetailView: View {
     public let onFullScreen: () -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @AppStorage("memo.store.data") private var memoStoreData: Data = Data()
 
     public init(
         app: AppInfo,
@@ -68,6 +69,24 @@ public struct DetailView: View {
                                     .foregroundStyle(.secondary)
                             }
                         }
+                    }
+
+                    if !memoText.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("메모")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text(memoText)
+                                .font(.body)
+                                .foregroundColor(.primary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.secondary.opacity(0.1))
+                        )
                     }
 
                     Text(app.description)
@@ -140,5 +159,11 @@ public struct DetailView: View {
         }
 
         return String(count)
+    }
+
+    private var memoText: String {
+        guard !memoStoreData.isEmpty else { return "" }
+        let store = (try? JSONDecoder().decode([Int: String].self, from: memoStoreData)) ?? [:]
+        return store[app.id]?.trimmed ?? ""
     }
 }
