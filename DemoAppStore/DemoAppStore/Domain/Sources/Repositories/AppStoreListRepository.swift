@@ -6,5 +6,5 @@ public protocol AppStoreListRepository {
         genreId: Int,
         limit: Int,
         offset: Int
-    ) async throws -> [AppInfo]
+    ) async throws -> [AppInfoEntity]
 }

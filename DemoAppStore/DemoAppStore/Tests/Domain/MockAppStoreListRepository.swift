@@ -3,7 +3,7 @@ import Core
 @testable import Domain
 
 final class MockAppStoreListRepository: AppStoreListRepository {
-    var fetchAppsResult: Result<[AppInfo], Error> = .success([])
+    var fetchAppsResult: Result<[AppInfoEntity], Error> = .success([])
     var fetchAppsCallCount = 0
     var lastFetchParameters: (term: String, genreId: Int, limit: Int, offset: Int)?
     

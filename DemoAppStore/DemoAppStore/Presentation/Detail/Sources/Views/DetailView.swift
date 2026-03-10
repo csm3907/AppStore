@@ -3,7 +3,7 @@ import Domain
 import SwiftUI
 
 public struct DetailView: View {
-    public let app: AppInfo
+    public let app: AppInfoEntity
     public let showsFullScreenButton: Bool
     public let showsCloseButton: Bool
     public let onFullScreen: () -> Void
@@ -12,7 +12,7 @@ public struct DetailView: View {
     @AppStorage("memo.store.data") private var memoStoreData: Data = Data()
 
     public init(
-        app: AppInfo,
+        app: AppInfoEntity,
         showsFullScreenButton: Bool = false,
         showsCloseButton: Bool = true,
         onFullScreen: @escaping () -> Void = {}

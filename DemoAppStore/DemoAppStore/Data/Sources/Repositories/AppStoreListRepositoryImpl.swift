@@ -12,7 +12,7 @@ public final class AppStoreListRepositoryImpl: AppStoreListRepository {
     private let baseURL: URL
     private let country: String
     private let entity: String
-    private var cache: [Int: [AppInfo]] = [:]
+    private var cache: [Int: [AppInfoEntity]] = [:]
     
     public init(
         client: NetworkClientProtocol,
@@ -39,7 +39,7 @@ public final class AppStoreListRepositoryImpl: AppStoreListRepository {
         genreId: Int,
         limit: Int,
         offset: Int
-    ) async throws -> [AppInfo] {
+    ) async throws -> [AppInfoEntity] {
         // 캐시 히트
         if let cached = cache[genreId] {
             print("[AppStoreListRepository] Cache hit for genreId: \(genreId)")
@@ -83,7 +83,7 @@ public final class AppStoreListRepositoryImpl: AppStoreListRepository {
         return apps
     }
 
-    private func map(dto: AppStoreAppDTO) throws -> AppInfo {
+    private func map(dto: AppStoreAppDTO) throws -> AppInfoEntity {
         let iconUrl = URL(string: dto.artworkUrl100)
         let screenshots = dto.screenshotUrls.compactMap { URL(string: $0) }
 
@@ -91,7 +91,7 @@ public final class AppStoreListRepositoryImpl: AppStoreListRepository {
             throw AppStoreRepositoryError.invalidReleaseDate(dto.currentVersionReleaseDate)
         }
 
-        return AppInfo(
+        return AppInfoEntity(
             id: dto.trackId,
             name: dto.trackName,
             seller: dto.sellerName,

@@ -1,13 +1,13 @@
 import Core
-import Data
 import Domain
 import Foundation
 import SwiftUI
+import Data
 
 @MainActor
 public final class HomeViewModel: ObservableObject {
     private let memoCharacterLimit = 100
-    @Published public var apps: [AppInfo] = []
+    @Published public var apps: [AppInfoEntity] = []
     @Published public var isLoading = false
     @Published public private(set) var isLoadingMore = false
     @Published public var errorMessage: String?
@@ -106,6 +106,8 @@ public final class HomeViewModel: ObservableObject {
                 errorMessage = "서버 오류 (\(code))"
             case .decodingError:
                 errorMessage = "데이터 파싱 오류입니다"
+            case .timeout:
+                errorMessage = "요청 시간이 초과되었습니다"
             }
         } catch {
             errorMessage = error.localizedDescription

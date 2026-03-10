@@ -4,7 +4,7 @@ import Foundation
 
 @MainActor
 public final class DetailViewModel: ObservableObject {
-    @Published public private(set) var app: AppInfo?
+    @Published public private(set) var app: AppInfoEntity?
     @Published public private(set) var isLoading = false
     @Published public private(set) var errorMessage: String?
 

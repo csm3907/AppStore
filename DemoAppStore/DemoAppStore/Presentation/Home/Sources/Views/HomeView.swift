@@ -10,10 +10,10 @@ public struct HomeView: View {
     @State private var isShowingMemoEditor = false
     @State private var isShowingMemoOnDrag = false
     @State private var memoText = ""
-    @State private var selectedApp: AppInfo?
-    @State private var selectedMemo: AppInfo?
-    @State private var fullScreenApp: AppInfo?
-    @State private var pendingFullScreenApp: AppInfo?
+    @State private var selectedApp: AppInfoEntity?
+    @State private var selectedMemo: AppInfoEntity?
+    @State private var fullScreenApp: AppInfoEntity?
+    @State private var pendingFullScreenApp: AppInfoEntity?
     private let tabs = HomeTab.allCases
 
     public init() {}

@@ -12,7 +12,7 @@ public struct AppStoreFetchUseCase {
         genreId: Int,
         limit: Int = 20,
         offset: Int = 0
-    ) async throws -> [AppInfo] {
+    ) async throws -> [AppInfoEntity] {
         return try await repository.fetchApps(
             term: term,
             genreId: genreId,

@@ -6,7 +6,7 @@ public struct NetworkConfiguration {
 
     public init(
         defaultHeaders: [String: String] = [:],
-        timeout: TimeInterval = 30
+        timeout: TimeInterval = 10
     ) {
         self.defaultHeaders = defaultHeaders
         self.timeout = timeout
@@ -153,16 +153,20 @@ public struct NetworkClient: NetworkClientProtocol {
             configuration: configuration
         )
 
-        let (data, response) = try await session.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw NetworkError.invalidResponse
-        }
+        do {
+            let (data, response) = try await session.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw NetworkError.invalidResponse
+            }
 
-        guard (200...299).contains(httpResponse.statusCode) else {
-            throw NetworkError.httpStatus(httpResponse.statusCode)
-        }
+            guard (200...299).contains(httpResponse.statusCode) else {
+                throw NetworkError.httpStatus(httpResponse.statusCode)
+            }
 
-        return data
+            return data
+        } catch let error as URLError where error.code == .timedOut {
+            throw NetworkError.timeout
+        }
     }
 }
 

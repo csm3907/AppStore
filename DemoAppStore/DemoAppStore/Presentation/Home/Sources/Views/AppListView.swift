@@ -6,13 +6,13 @@ import UniformTypeIdentifiers
 struct AppListView: View {
     // MARK: - Variables
     @ObservedObject var viewModel: HomeViewModel
-    @Binding var apps: [AppInfo]
+    @Binding var apps: [AppInfoEntity]
     @Binding var selectedIndex: Int
     @Binding var memoText: String
     @Binding var isShowingMemoEditor: Bool
     @Binding var isShowingMemoOnDrag: Bool
-    @Binding var selectedApp: AppInfo?
-    @Binding var selectedMemo: AppInfo?
+    @Binding var selectedApp: AppInfoEntity?
+    @Binding var selectedMemo: AppInfoEntity?
     let isLoadingMore: Bool
     let onLoadMore: () -> Void
     @State private var showPreviousCard = false
@@ -121,7 +121,7 @@ struct AppListView: View {
 }
 
 private struct AppRowView: View {
-    let app: AppInfo
+    let app: AppInfoEntity
     let hasMemo: Bool
     let onIconTap: () -> Void
 

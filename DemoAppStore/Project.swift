@@ -60,6 +60,7 @@ let project = Project(
             ],
             dependencies: [
                 .target(name: "Domain"),
+                .target(name: "PresentationDetail"),
                 .target(name: "Core")
             ]
         ),
