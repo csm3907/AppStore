@@ -3,6 +3,7 @@ import SwiftUI
 struct MemoEditorView: View {
     @Binding var text: String
     @Binding var isShowingMemoOnDrag: Bool
+    @FocusState private var isTextEditorFocused: Bool
     let appName: String?
     var onSave: (() -> Void)?
     var onCancel: () -> Void
@@ -48,6 +49,7 @@ struct MemoEditorView: View {
             }
 
             TextEditor(text: $text)
+                .focused($isTextEditorFocused)
                 .frame(height: 160)
                 .padding(8)
                 .background(Color.secondary.opacity(0.08))
@@ -70,6 +72,7 @@ struct MemoEditorView: View {
                 .background(Color.secondary.opacity(0.08))
                 .clipShape(Capsule())
                 .onDrag {
+                    isTextEditorFocused = false
                     isShowingMemoOnDrag = true
                     return NSItemProvider(object: text as NSString)
                 } preview: {

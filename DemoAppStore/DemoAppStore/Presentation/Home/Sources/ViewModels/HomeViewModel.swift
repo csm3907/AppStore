@@ -79,13 +79,16 @@ public final class HomeViewModel: ObservableObject {
                 if !newApps.isEmpty {
                     apps.append(contentsOf: newApps)
                 }
-                offsetsByGenre[genreId] = offset
+                offsetsByGenre[genreId] = offset + result.count
                 if reachedEnd {
                     endReachedGenres.insert(genreId)
                 }
             } else {
                 apps = result
-                offsetsByGenre[genreId] = offset
+                offsetsByGenre[genreId] = result.count
+                if result.count < limit {
+                    endReachedGenres.insert(genreId)
+                }
             }
         } catch {
             errorMessage = error.localizedDescription

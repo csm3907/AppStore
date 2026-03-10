@@ -7,11 +7,13 @@ public enum AppStoreRepositoryError: Error {
     case invalidReleaseDate(String)
 }
 
-public struct AppStoreListRepositoryImpl: AppStoreListRepository {
+public final class AppStoreListRepositoryImpl: AppStoreListRepository {
     private let client: NetworkClientProtocol
     private let baseURL: URL
     private let country: String
     private let entity: String
+    private var cache: [Int: [AppInfo]] = [:]
+    
     public init(
         client: NetworkClientProtocol,
         baseURL: URL = URL(string: "https://itunes.apple.com/search")!,
@@ -23,6 +25,14 @@ public struct AppStoreListRepositoryImpl: AppStoreListRepository {
         self.country = country
         self.entity = entity
     }
+    
+    public func clearCache() {
+        cache.removeAll()
+    }
+    
+    public func clearCache(for genreId: Int) {
+        cache.removeValue(forKey: genreId)
+    }
 
     public func fetchApps(
         term: String,
@@ -30,6 +40,12 @@ public struct AppStoreListRepositoryImpl: AppStoreListRepository {
         limit: Int,
         offset: Int
     ) async throws -> [AppInfo] {
+        // 캐시 히트
+        if let cached = cache[genreId] {
+            print("[AppStoreListRepository] Cache hit for genreId: \(genreId)")
+            return cached
+        }
+        
         guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
             throw AppStoreRepositoryError.invalidURL
         }
@@ -56,9 +72,15 @@ public struct AppStoreListRepositoryImpl: AppStoreListRepository {
         )
         print("[AppStoreListRepository] Response: resultCount=\(String(describing: response.results.map({ $0.trackName })))")
 
-        return try response.results.map { dto in
+        let apps = try response.results.map { dto in
             try map(dto: dto)
         }
+        
+        // 캐시 저장
+        cache[genreId] = apps
+        print("[AppStoreListRepository] Cached \(apps.count) apps for genreId: \(genreId)")
+        
+        return apps
     }
 
     private func map(dto: AppStoreAppDTO) throws -> AppInfo {

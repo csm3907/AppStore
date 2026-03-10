@@ -117,7 +117,6 @@ public struct HomeView: View {
                 }
                 .opacity(isShowingMemoOnDrag ? 0 : 1)
                 .transition(.scale)
-                .offset(y: -80)
             }
         }
         .animation(.easeInOut(duration: 0.2), value: isShowingMemoEditor)
