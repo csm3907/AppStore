@@ -43,6 +43,16 @@ public struct HomeView: View {
                     showsCloseButton: true
                 ) {}
             }
+            .alert("오류", isPresented: .init(
+                get: { viewModel.errorMessage != nil },
+                set: { if !$0 { viewModel.errorMessage = nil } }
+            )) {
+                Button("확인", role: .cancel) {
+                    viewModel.errorMessage = nil
+                }
+            } message: {
+                Text(viewModel.errorMessage ?? "")
+            }
     }
 
     @ViewBuilder

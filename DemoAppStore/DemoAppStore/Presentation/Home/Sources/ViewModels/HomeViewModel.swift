@@ -1,4 +1,5 @@
 import Core
+import Data
 import Domain
 import Foundation
 import SwiftUI
@@ -9,7 +10,7 @@ public final class HomeViewModel: ObservableObject {
     @Published public var apps: [AppInfo] = []
     @Published public var isLoading = false
     @Published public private(set) var isLoadingMore = false
-    @Published public private(set) var errorMessage: String?
+    @Published public var errorMessage: String?
 
     @AppStorage("memo.store.data") private var memoStoreData: Data = Data()
 
@@ -89,6 +90,22 @@ public final class HomeViewModel: ObservableObject {
                 if result.count < limit {
                     endReachedGenres.insert(genreId)
                 }
+            }
+        } catch let error as AppStoreRepositoryError {
+            switch error {
+            case .invalidURL:
+                errorMessage = "잘못된 요청입니다"
+            case .invalidReleaseDate:
+                errorMessage = "데이터 형식 오류입니다"
+            }
+        } catch let error as NetworkError {
+            switch error {
+            case .invalidResponse:
+                errorMessage = "서버 응답 오류입니다"
+            case .httpStatus(let code):
+                errorMessage = "서버 오류 (\(code))"
+            case .decodingError:
+                errorMessage = "데이터 파싱 오류입니다"
             }
         } catch {
             errorMessage = error.localizedDescription
