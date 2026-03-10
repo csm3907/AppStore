@@ -7,7 +7,7 @@ import SwiftUI
 public final class HomeViewModel: ObservableObject {
     private let memoCharacterLimit = 100
     @Published public var apps: [AppInfo] = []
-    @Published public private(set) var isLoading = false
+    @Published public var isLoading = false
     @Published public private(set) var isLoadingMore = false
     @Published public private(set) var errorMessage: String?
 
@@ -24,9 +24,11 @@ public final class HomeViewModel: ObservableObject {
     }
 
     public func requestFetch(term: String, genreId: Int, limit: Int = 20, offset: Int = 0) {
+        isLoading = true
         debounceTask?.cancel()
         debounceTask = Task { [weak self] in
-            //try? await Task.sleep(nanoseconds: 500_000_000)
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            guard !Task.isCancelled else { return }
             await self?.fetchAppsNow(term: term, genreId: genreId, limit: limit, offset: offset, append: false)
         }
     }
@@ -53,10 +55,6 @@ public final class HomeViewModel: ObservableObject {
             }
             isLoadingMore = true
         } else {
-            if isLoading {
-                return
-            }
-            isLoading = true
             if currentGenreId != genreId {
                 currentGenreId = genreId
             }

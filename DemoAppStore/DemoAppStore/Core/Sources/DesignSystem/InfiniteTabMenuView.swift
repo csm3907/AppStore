@@ -25,15 +25,18 @@ public struct InfiniteTabMenuView<Tab: Hashable & CustomStringConvertible>: View
 
     let tabs: [Tab]
     @Binding var selectedIndex: Int
+    @Binding var isLoading: Bool
     let onScrollEnd: ((Int) -> Void)?
 
     public init(
         tabs: [Tab],
         selectedIndex: Binding<Int>,
+        isLoading: Binding<Bool>,
         onScrollEnd: ((Int) -> Void)? = nil
     ) {
         self.tabs = tabs
         self._selectedIndex = selectedIndex
+        self._isLoading = isLoading
         self.onScrollEnd = onScrollEnd
     }
 
@@ -42,6 +45,7 @@ public struct InfiniteTabMenuView<Tab: Hashable & CustomStringConvertible>: View
             _InfiniteTabScrollView(
                 tabs: tabs,
                 selectedIndex: $selectedIndex,
+                isLoading: $isLoading,
                 onScrollEnd: onScrollEnd
             )
                 .frame(height: 46)
@@ -58,12 +62,14 @@ private struct _InfiniteTabScrollView<Tab: Hashable & CustomStringConvertible>: 
 
     let tabs: [Tab]
     @Binding var selectedIndex: Int
+    @Binding var isLoading: Bool
     let onScrollEnd: ((Int) -> Void)?
 
     func makeCoordinator() -> Coordinator<Tab> {
         Coordinator(
             tabs: tabs,
             selectedIndex: $selectedIndex,
+            isLoading: $isLoading,
             onScrollEnd: onScrollEnd
         )
     }
@@ -83,6 +89,7 @@ private struct _InfiniteTabScrollView<Tab: Hashable & CustomStringConvertible>: 
 
         let tabs: [TabItem]
         @Binding var selectedIndex: Int
+        @Binding var isLoading: Bool
         private let onScrollEnd: ((Int) -> Void)?
 
         // ── 무한 스크롤 핵심 상수 ───────────────────────────
@@ -112,10 +119,12 @@ private struct _InfiniteTabScrollView<Tab: Hashable & CustomStringConvertible>: 
         init(
             tabs: [TabItem],
             selectedIndex: Binding<Int>,
+            isLoading: Binding<Bool>,
             onScrollEnd: ((Int) -> Void)?
         ) {
             self.tabs = tabs
             self._selectedIndex = selectedIndex
+            self._isLoading = isLoading
             self.onScrollEnd = onScrollEnd
         }
 
@@ -256,6 +265,7 @@ private struct _InfiniteTabScrollView<Tab: Hashable & CustomStringConvertible>: 
         }
 
         func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+            isLoading = true
             isProgrammaticScroll = false
         }
 
@@ -401,10 +411,11 @@ private struct _InfiniteTabMenuPreview: View {
     }
 
     @State private var selectedIndex: Int = 0
+    @State private var isLoading: Bool = false
 
     var body: some View {
         VStack(spacing: 0) {
-            InfiniteTabMenuView(tabs: HomeTab.allCases, selectedIndex: $selectedIndex)
+            InfiniteTabMenuView(tabs: HomeTab.allCases, selectedIndex: $selectedIndex, isLoading: $isLoading)
 
             ZStack {
                 Color(uiColor: .systemGroupedBackground)

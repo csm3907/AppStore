@@ -62,7 +62,7 @@ public struct HomeView: View {
     private var mainContent: some View {
         ZStack {
             VStack(spacing: 0) {
-                InfiniteTabMenuView(tabs: tabs, selectedIndex: $selectedIndex) { index in
+                InfiniteTabMenuView(tabs: tabs, selectedIndex: $selectedIndex, isLoading: $viewModel.isLoading) { index in
                     viewModel.requestFetch(term: tabs[index].term, genreId: tabs[index].genreId)
                 }
 
