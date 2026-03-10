@@ -1,11 +1,11 @@
 import Foundation
 
-public struct AppStoreSearchResponse: Decodable {
+public struct AppStoreSearchResponse: Codable {
     public let resultCount: Int
     public let results: [AppStoreAppDTO]
 }
 
-public struct AppStoreAppDTO: Decodable {
+public struct AppStoreAppDTO: Codable {
     public let trackId: Int
     public let trackName: String
     public let sellerName: String

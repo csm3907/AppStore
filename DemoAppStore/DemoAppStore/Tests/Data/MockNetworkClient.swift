@@ -1,22 +1,26 @@
 import Foundation
+import Core
+@testable import Data
 
-public struct MockNetworkClient: NetworkClientProtocol {
-    public var getHandler: (URL, [String: String]) async throws -> Data
-    public var postDataHandler: (URL, Data, [String: String]) async throws -> Data
+public final class MockNetworkClient: NetworkClientProtocol {
+    public var getResult: Result<Data, Error> = .success(Data())
+    public var getCallCount = 0
+    public var lastGetURL: URL?
+    
+    public var postResult: Result<Data, Error> = .success(Data())
+    public var postCallCount = 0
+    public var lastPostURL: URL?
+    public var lastPostBody: Data?
 
-    public init(
-        getHandler: @escaping (URL, [String: String]) async throws -> Data,
-        postDataHandler: @escaping (URL, Data, [String: String]) async throws -> Data
-    ) {
-        self.getHandler = getHandler
-        self.postDataHandler = postDataHandler
-    }
+    public init() {}
 
     public func get(
         _ url: URL,
         headers: [String: String] = [:]
     ) async throws -> Data {
-        return try await getHandler(url, headers)
+        getCallCount += 1
+        lastGetURL = url
+        return try getResult.get()
     }
 
     public func get<Response: Decodable>(
@@ -37,7 +41,10 @@ public struct MockNetworkClient: NetworkClientProtocol {
         body: Data,
         headers: [String: String] = [:]
     ) async throws -> Data {
-        return try await postDataHandler(url, body, headers)
+        postCallCount += 1
+        lastPostURL = url
+        lastPostBody = body
+        return try postResult.get()
     }
 
     public func post<Body: Encodable>(
@@ -47,11 +54,7 @@ public struct MockNetworkClient: NetworkClientProtocol {
         encoder: JSONEncoder = JSONEncoder()
     ) async throws -> Data {
         let jsonData = try encoder.encode(body)
-        return try await post(
-            url,
-            body: jsonData,
-            headers: headers
-        )
+        return try await post(url, body: jsonData, headers: headers)
     }
 
     public func post<Body: Encodable, Response: Decodable>(
@@ -61,16 +64,22 @@ public struct MockNetworkClient: NetworkClientProtocol {
         encoder: JSONEncoder = JSONEncoder(),
         decoder: JSONDecoder = JSONDecoder()
     ) async throws -> Response {
-        let data = try await post(
-            url,
-            body: body,
-            headers: headers,
-            encoder: encoder
-        )
+        let data = try await post(url, body: body, headers: headers, encoder: encoder)
         do {
             return try decoder.decode(Response.self, from: data)
         } catch {
             throw NetworkError.decodingError(data, error)
         }
     }
+}
+
+// MARK: - 테스트용 DI 설정
+@discardableResult
+func registerDataMockDependencies(container: Container) -> MockNetworkClient {
+    let mockClient = MockNetworkClient()
+    container.register(NetworkClientProtocol.self) { mockClient }
+    container.register(AppStoreListRepositoryImpl.self) {
+        AppStoreListRepositoryImpl(client: container.resolve(NetworkClientProtocol.self))
+    }
+    return mockClient
 }

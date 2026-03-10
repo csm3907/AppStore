@@ -181,5 +181,17 @@ let project = Project(
                 .target(name: "PresentationHome")
             ]
         )
+    ],
+    schemes: [
+        .scheme(
+            name: "DomainTests",
+            buildAction: .buildAction(targets: ["DomainTests"]),
+            testAction: .targets(["DomainTests"])
+        ),
+        .scheme(
+            name: "DataTests",
+            buildAction: .buildAction(targets: ["DataTests"]),
+            testAction: .targets(["DataTests"])
+        )
     ]
 )
