@@ -27,6 +27,7 @@ struct MemoEditorView: View {
             HStack {
                 Text("메모")
                     .font(.headline)
+                
                 Spacer()
                 
                 if appName != nil {
@@ -50,7 +51,15 @@ struct MemoEditorView: View {
 
             TextEditor(text: $text)
                 .focused($isTextEditorFocused)
-                .frame(height: 160)
+                .toolbar {
+                    ToolbarItemGroup(placement: .keyboard) {
+                        Spacer()
+                        Button("내리기") {
+                            isTextEditorFocused = false
+                        }
+                    }
+                }
+                .frame(height: 130)
                 .padding(8)
                 .background(Color.secondary.opacity(0.08))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -59,10 +68,11 @@ struct MemoEditorView: View {
                         text = String(newValue.prefix(100))
                     }
                 }
+            
             if appName == nil {
                 HStack {
                     Image(systemName: "hand.draw")
-                    Text("메모를 길게 눌러 드래그")
+                    Text("길게 눌러 드래그")
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -71,17 +81,6 @@ struct MemoEditorView: View {
                 .padding(.vertical, 6)
                 .background(Color.secondary.opacity(0.08))
                 .clipShape(Capsule())
-                .onDrag {
-                    isTextEditorFocused = false
-                    isShowingMemoOnDrag = true
-                    return NSItemProvider(object: text as NSString)
-                } preview: {
-                    Text(text.isEmpty ? "메모" : text)
-                        .font(.caption)
-                        .padding(8)
-                        .background(.thinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                }
             }
         }
         .opacity(isShowingMemoOnDrag ? 0 : 1)
@@ -90,5 +89,16 @@ struct MemoEditorView: View {
         .background(Color(uiColor: .systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(radius: 12)
+        .onDrag {
+            isTextEditorFocused = false
+            isShowingMemoOnDrag = true
+            return NSItemProvider(object: text as NSString)
+        } preview: {
+            Text(text.isEmpty ? "메모" : text)
+                .font(.caption)
+                .padding(8)
+                .background(.thinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
     }
 }

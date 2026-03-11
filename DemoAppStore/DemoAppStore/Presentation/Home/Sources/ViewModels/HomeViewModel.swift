@@ -133,6 +133,9 @@ public final class HomeViewModel: ObservableObject {
     }
 
     public func saveMemo(_ text: String, for appId: Int) {
+        guard !text.isEmpty else {
+            return
+        }
         let limitedText = String(text.prefix(memoCharacterLimit))
         var store = loadMemoStore()
         store[appId] = limitedText

@@ -27,13 +27,25 @@ public struct HomeView: View {
                 viewModel.requestFetch(term: tabs[newIndex].term, genreId: tabs[newIndex].genreId)
             }
             .sheet(item: $selectedApp, onDismiss: handleSheetDismiss) { app in
-                DetailView(
-                    app: app,
-                    showsFullScreenButton: true,
-                    showsCloseButton: true
-                ) {
-                    pendingFullScreenApp = app
-                    selectedApp = nil
+                if #available(iOS 16.0, *) {
+                    DetailView(
+                        app: app,
+                        showsFullScreenButton: true,
+                        showsCloseButton: true
+                    ) {
+                        pendingFullScreenApp = app
+                        selectedApp = nil
+                    }
+                    .presentationDetents([.medium, .large])
+                } else {
+                    DetailView(
+                        app: app,
+                        showsFullScreenButton: true,
+                        showsCloseButton: true
+                    ) {
+                        pendingFullScreenApp = app
+                        selectedApp = nil
+                    }
                 }
             }
             .fullScreenCover(item: $fullScreenApp) { app in
@@ -130,7 +142,7 @@ public struct HomeView: View {
             }
         }
         .animation(.easeInOut(duration: 0.2), value: isShowingMemoEditor)
-        .navigationTitle("AppStore")
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
