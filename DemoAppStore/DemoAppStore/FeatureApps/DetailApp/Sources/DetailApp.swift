@@ -2,10 +2,14 @@ import SwiftUI
 import PresentationDetail
 
 @main
-struct FixmeDetailApp: App {
+struct DetailApp: App {
+    init() {
+        DetailAppDI.register()
+    }
+
     var body: some Scene {
         WindowGroup {
-            FixmeDetailView()
+            DetailAppRootView()
         }
     }
 }

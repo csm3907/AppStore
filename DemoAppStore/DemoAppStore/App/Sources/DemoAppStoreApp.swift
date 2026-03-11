@@ -3,10 +3,14 @@ import PresentationHome
 import PresentationDetail
 
 @main
-struct FixmeDemoAppStoreApp: App {
+struct DemoAppStoreApp: App {
+    init() {
+        AppDI.register()
+    }
+
     var body: some Scene {
         WindowGroup {
-            FixmeHomeView()
+            HomeView()
         }
     }
 }

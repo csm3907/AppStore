@@ -2,10 +2,14 @@ import SwiftUI
 import PresentationHome
 
 @main
-struct FixmeHomeApp: App {
+struct HomeApp: App {
+    init() {
+        HomeAppDI.register()
+    }
+
     var body: some Scene {
         WindowGroup {
-            FixmeHomeView()
+            HomeView()
         }
     }
 }
