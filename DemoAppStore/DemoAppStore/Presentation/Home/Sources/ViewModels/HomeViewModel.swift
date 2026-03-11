@@ -91,6 +91,12 @@ public final class HomeViewModel: ObservableObject {
                     endReachedGenres.insert(genreId)
                 }
             }
+        } catch is CancellationError {
+            // 사용자가 탭 전환 등으로 취소한 경우 - 상태 변경 없이 종료
+            return
+        } catch let error as URLError where error.code == .cancelled {
+            // URLSession 요청이 취소된 경우 - 상태 변경 없이 종료
+            return
         } catch let error as AppStoreRepositoryError {
             switch error {
             case .invalidURL:
