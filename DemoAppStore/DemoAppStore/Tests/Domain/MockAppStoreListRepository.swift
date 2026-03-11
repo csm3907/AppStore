@@ -12,7 +12,7 @@ final class MockAppStoreListRepository: AppStoreListRepository {
         genreId: Int,
         limit: Int,
         offset: Int
-    ) async throws -> [AppInfo] {
+    ) async throws -> [AppInfoEntity] {
         fetchAppsCallCount += 1
         lastFetchParameters = (term, genreId, limit, offset)
         return try fetchAppsResult.get()

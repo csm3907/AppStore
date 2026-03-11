@@ -11,7 +11,7 @@ struct AppStoreFetchUseCaseTests {
         // Given - DI Container로 Mock 주입
         let container = Container()
         let mockRepository = registerMockDependencies(container: container)
-        let expectedApps = [createMockAppInfoEntity(id: 1, name: "App1")]
+        let expectedApps = [createMockAppInfo(id: 1, name: "App1")]
         mockRepository.fetchAppsResult = .success(expectedApps)
         
         let useCase: AppStoreFetchUseCase = container.resolve()
@@ -77,8 +77,8 @@ struct AppStoreFetchUseCaseTests {
 }
 
 // MARK: - Helper
-private func createMockAppInfo(id: Int, name: String) -> AppInfo {
-    AppInfo(
+private func createMockAppInfo(id: Int, name: String) -> AppInfoEntity {
+    AppInfoEntity(
         id: id,
         name: name,
         seller: "Test Seller",
