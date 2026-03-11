@@ -26,34 +26,15 @@ public struct HomeView: View {
             .onChange(of: selectedIndex) { newIndex in
                 viewModel.requestFetch(term: tabs[newIndex].term, genreId: tabs[newIndex].genreId)
             }
-            .sheet(item: $selectedApp, onDismiss: handleSheetDismiss) { app in
-                if #available(iOS 16.0, *) {
-                    DetailView(
-                        app: app,
-                        showsFullScreenButton: true,
-                        showsCloseButton: true
-                    ) {
-                        pendingFullScreenApp = app
-                        selectedApp = nil
-                    }
-                    .presentationDetents([.medium, .large])
-                } else {
-                    DetailView(
-                        app: app,
-                        showsFullScreenButton: true,
-                        showsCloseButton: true
-                    ) {
-                        pendingFullScreenApp = app
-                        selectedApp = nil
-                    }
-                }
-            }
             .fullScreenCover(item: $fullScreenApp) { app in
                 DetailView(
                     app: app,
                     showsFullScreenButton: false,
-                    showsCloseButton: true
-                ) {}
+                    showsCloseButton: true,
+                    onClose:  {
+                        fullScreenApp = nil
+                    }
+                )
             }
             .alert("오류", isPresented: .init(
                 get: { viewModel.errorMessage != nil },
@@ -114,6 +95,32 @@ public struct HomeView: View {
                 }
             }
 
+            if let selectedApp {
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        dismissDetailOverlay()
+                    }
+
+                DetailView(
+                    app: selectedApp,
+                    showsFullScreenButton: true,
+                    showsCloseButton: true
+                ) {
+                    pendingFullScreenApp = selectedApp
+                    dismissDetailOverlay()
+                } onClose: {
+                    dismissDetailOverlay()
+                }
+                .frame(maxWidth: 720)
+                .frame(maxHeight: 600)
+                .background(Color(uiColor: .systemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .shadow(radius: 12)
+                .padding(16)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+
             if isShowingMemoEditor {
                 Color.black.opacity(0.3)
                     .ignoresSafeArea()
@@ -159,6 +166,11 @@ public struct HomeView: View {
                 }
             }
         }
+    }
+
+    private func dismissDetailOverlay() {
+        selectedApp = nil
+        handleSheetDismiss()
     }
 
     private func handleSheetDismiss() {

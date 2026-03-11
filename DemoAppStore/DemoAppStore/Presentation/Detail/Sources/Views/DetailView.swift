@@ -7,6 +7,7 @@ public struct DetailView: View {
     public let showsFullScreenButton: Bool
     public let showsCloseButton: Bool
     public let onFullScreen: () -> Void
+    public let onClose: (() -> Void)?
 
     @Environment(\.dismiss) private var dismiss
     @AppStorage("memo.store.data") private var memoStoreData: Data = Data()
@@ -15,12 +16,14 @@ public struct DetailView: View {
         app: AppInfoEntity,
         showsFullScreenButton: Bool = false,
         showsCloseButton: Bool = true,
-        onFullScreen: @escaping () -> Void = {}
+        onFullScreen: @escaping () -> Void = {},
+        onClose: (() -> Void)? = nil
     ) {
         self.app = app
         self.showsFullScreenButton = showsFullScreenButton
         self.showsCloseButton = showsCloseButton
         self.onFullScreen = onFullScreen
+        self.onClose = onClose
     }
 
     public var body: some View {
@@ -127,7 +130,11 @@ public struct DetailView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     if showsCloseButton {
                         Button("닫기") {
-                            dismiss()
+                            if let onClose {
+                                onClose()
+                            } else {
+                                dismiss()
+                            }
                         }
                     } else {
                         EmptyView()
