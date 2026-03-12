@@ -207,7 +207,7 @@ private struct _InfiniteTabScrollView<Tab: Hashable & CustomStringConvertible>: 
             guard !isExternalUpdate,
                   tabIndex < tabs.count,
                   tabIndex != currentTabIndex else { return }
-
+            
             if scrollView.isDragging || scrollView.isDecelerating || scrollView.isTracking {
                 return
             }
@@ -257,6 +257,7 @@ private struct _InfiniteTabScrollView<Tab: Hashable & CustomStringConvertible>: 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
             guard adjustForInfiniteLoopIfNeeded(scrollView) else { return }
             guard !isProgrammaticScroll else { return }
+            guard scrollView.isDragging || scrollView.isDecelerating else { return } // landscape <-> portrait 이동으로 인한 변경 방지
 
             let detectedGlobalIndex = globalIndexAtCenter(scrollView)
             if detectedGlobalIndex != currentGlobalIndex {

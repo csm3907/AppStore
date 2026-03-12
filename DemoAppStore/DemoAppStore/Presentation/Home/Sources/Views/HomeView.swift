@@ -20,11 +20,8 @@ public struct HomeView: View {
 
     public var body: some View {
         content
-            .task {
+            .task(id: selectedIndex) {
                 viewModel.requestFetch(term: tabs[selectedIndex].term, genreId: tabs[selectedIndex].genreId)
-            }
-            .onChange(of: selectedIndex) { newIndex in
-                viewModel.requestFetch(term: tabs[newIndex].term, genreId: tabs[newIndex].genreId)
             }
             .fullScreenCover(item: $fullScreenApp) { app in
                 DetailView(

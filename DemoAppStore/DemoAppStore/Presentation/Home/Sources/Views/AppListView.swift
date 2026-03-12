@@ -16,6 +16,7 @@ struct AppListView: View {
     let isLoadingMore: Bool
     let onLoadMore: () -> Void
     @State private var showPreviousCard = false
+    @State private var expandedDescriptions: Set<Int> = []
 
     private let tabs = HomeTab.allCases
 
@@ -29,6 +30,10 @@ struct AppListView: View {
                         AppRowView(
                             app: app,
                             hasMemo: !memoText.isEmpty,
+                            isDescriptionExpanded: expandedDescriptions.contains(app.id),
+                            onToggleDescription: {
+                                toggleDescriptionExpansion(for: app.id)
+                            },
                             onIconTap: {
                                 selectedMemo = app
                                 self.memoText = viewModel.memo(for: app.id)?.trimmed ?? ""
@@ -118,11 +123,21 @@ struct AppListView: View {
         return true
     }
 
+    private func toggleDescriptionExpansion(for appId: Int) {
+        if expandedDescriptions.contains(appId) {
+            expandedDescriptions.remove(appId)
+        } else {
+            expandedDescriptions.insert(appId)
+        }
+    }
+
 }
 
 private struct AppRowView: View {
     let app: AppInfoEntity
     let hasMemo: Bool
+    let isDescriptionExpanded: Bool
+    let onToggleDescription: () -> Void
     let onIconTap: () -> Void
 
     var body: some View {
@@ -159,7 +174,16 @@ private struct AppRowView: View {
                 Text(app.description)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
-                    .lineLimit(2)
+                    .lineLimit(isDescriptionExpanded ? nil : 2)
+
+                if shouldShowMoreButton {
+                    Button(isDescriptionExpanded ? "접기" : "더보기") {
+                        onToggleDescription()
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .buttonStyle(.plain)
+                }
             }
 
             Spacer()
@@ -188,6 +212,10 @@ private struct AppRowView: View {
                 .foregroundColor(hasMemo ? .accentColor : .secondary)
         }
         .padding(.vertical, 6)
+    }
+
+    private var shouldShowMoreButton: Bool {
+        app.description.count > 80
     }
 
     private func formatCount(_ count: Int) -> String {
