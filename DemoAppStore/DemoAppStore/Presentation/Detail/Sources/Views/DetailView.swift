@@ -152,6 +152,7 @@ public struct DetailView: View {
                 }
             }
         }
+        .navigationViewStyle(.stack)
     }
 
     private func formatCount(_ count: Int) -> String {

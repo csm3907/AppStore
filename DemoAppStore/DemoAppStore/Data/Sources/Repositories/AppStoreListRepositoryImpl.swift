@@ -73,7 +73,7 @@ public final class AppStoreListRepositoryImpl: AppStoreListRepository {
         print("[AppStoreListRepository] Response: resultCount=\(String(describing: response.results.map({ $0.trackName })))")
 
         let apps = try response.results.map { dto in
-            try map(dto: dto)
+            try dto.toDomain()
         }
         
         // 캐시 저장
@@ -83,45 +83,4 @@ public final class AppStoreListRepositoryImpl: AppStoreListRepository {
         return apps
     }
 
-    private func map(dto: AppStoreAppDTO) throws -> AppInfoEntity {
-        let iconUrl = URL(string: dto.artworkUrl100)
-        let screenshots = dto.screenshotUrls.compactMap { URL(string: $0) }
-
-        guard let releaseDate = Self.parseDate(dto.currentVersionReleaseDate) else {
-            throw AppStoreRepositoryError.invalidReleaseDate(dto.currentVersionReleaseDate)
-        }
-
-        return AppInfoEntity(
-            id: dto.trackId,
-            name: dto.trackName,
-            seller: dto.sellerName,
-            iconUrl: iconUrl,
-            genre: dto.primaryGenreName,
-            rating: dto.averageUserRating,
-            ratingCount: dto.userRatingCount,
-            version: dto.version,
-            releaseDate: releaseDate,
-            description: dto.description,
-            screenshotUrls: screenshots
-        )
-    }
-
-    private static func parseDate(_ value: String) -> Date? {
-        for formatter in dateFormatters {
-            if let date = formatter.date(from: value) {
-                return date
-            }
-        }
-        return nil
-    }
-
-    private static let dateFormatters: [ISO8601DateFormatter] = {
-        let withFractional = ISO8601DateFormatter()
-        withFractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-
-        let withoutFractional = ISO8601DateFormatter()
-        withoutFractional.formatOptions = [.withInternetDateTime]
-
-        return [withFractional, withoutFractional]
-    }()
 }
